@@ -371,6 +371,19 @@ parameters:
             default: 0
 
 
+        # Others
+        CA_FAILURE_MODE:
+            description:
+                short: Motor failure handling mode
+                long: |
+                    This is used to specify how to handle motor failures
+                    reported by failure detector.
+            type: enum
+            values:
+                0: Ignore
+                1: Remove first failed motor from effectiveness
+            default: 0
+
 # Mixer
 mixer:
     actuator_types:
