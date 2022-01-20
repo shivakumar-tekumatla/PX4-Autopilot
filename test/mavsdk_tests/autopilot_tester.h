@@ -136,6 +136,10 @@ public:
 	void start_checking_altitude(const float max_deviation_m);
 	void stop_checking_altitude();
 
+protected:
+	mavsdk::Param *getParams() const { return _param.get();}
+	mavsdk::Telemetry *getTelemetry() const { return _telemetry.get();}
+	std::shared_ptr<System> get_system() { return _mavsdk.systems().at(0);}
 
 private:
 	mavsdk::geometry::CoordinateTransformation get_coordinate_transformation();
