@@ -116,6 +116,8 @@ RCInput::init()
 	px4_arch_unconfiggpio(GPIO_PPM_IN);
 #endif // GPIO_PPM_IN
 
+	rc_io_invert(false);
+
 	return 0;
 }
 
