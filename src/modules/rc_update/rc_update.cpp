@@ -579,6 +579,7 @@ void RCUpdate::UpdateManualSwitches(const hrt_abstime &timestamp_sample)
 {
 	manual_control_switches_s switches{};
 	switches.timestamp_sample = timestamp_sample;
+	switches.mode_slot = manual_control_switches_s::MODE_SLOT_NONE;
 
 	// check mode slot (RC_MAP_FLTMODE)
 	if (_param_rc_map_fltmode.get() > 0) {
@@ -598,15 +599,28 @@ void RCUpdate::UpdateManualSwitches(const hrt_abstime &timestamp_sample)
 		// slots. And finally we add half a slot width to ensure that integer rounding
 		// will take us to the correct final index.
 		const float value = _rc.channels[_param_rc_map_fltmode.get() - 1];
-		switches.mode_slot = (((((value - slot_min) * num_slots) + slot_width_half) / (slot_max - slot_min)) +
-				      slot_width_half) + 1;
+		uint8_t switch_slot = (((((value - slot_min) * num_slots) + slot_width_half) / (slot_max - slot_min)) +
+				       slot_width_half) + 1;
 
-		if (switches.mode_slot > num_slots) {
-			switches.mode_slot = num_slots;
+		if (switch_slot > num_slots) {
+			switch_slot = num_slots;
 		}
 
-	} else if (_param_rc_map_fltm_btn.get() > 0) {
-		switches.mode_slot = manual_control_switches_s::MODE_SLOT_NONE;
+		// Make sure the mode switch upon consistent change sets the corresponding slot for two samples to pass the simple outlier protection
+		const bool switch_stayed_then_changed = (_last_switch_slot == _last_last_switch_slot)
+							&& (switch_slot != _last_switch_slot);
+		const bool switch_changed_then_stayed = (_last_switch_slot != _last_last_switch_slot)
+							&& (switch_slot == _last_switch_slot);
+
+		if (switch_stayed_then_changed || switch_changed_then_stayed) {
+			switches.mode_slot = switch_slot;
+		}
+
+		_last_last_switch_slot = _last_switch_slot;
+		_last_switch_slot = switch_slot;
+	}
+
+	if (_param_rc_map_fltm_btn.get() > 0) {
 		bool is_consistent_button_press = false;
 
 		for (uint8_t slot = 0; slot < manual_control_switches_s::MODE_SLOT_NUM; slot++) {

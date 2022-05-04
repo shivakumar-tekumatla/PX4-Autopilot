@@ -188,7 +188,9 @@ public:
 	uint8_t _channel_count_previous{0};
 	uint8_t _input_source_previous{input_rc_s::RC_INPUT_SOURCE_UNKNOWN};
 
-	uint8_t _potential_button_press_slot{0};
+	uint8_t _last_switch_slot{manual_control_switches_s::MODE_SLOT_NONE};
+	uint8_t _last_last_switch_slot{manual_control_switches_s::MODE_SLOT_NONE};
+	uint8_t _potential_button_press_slot{manual_control_switches_s::MODE_SLOT_NONE};
 	systemlib::Hysteresis _button_pressed_hysteresis{false};
 	systemlib::Hysteresis _rc_signal_lost_hysteresis{true};
 
