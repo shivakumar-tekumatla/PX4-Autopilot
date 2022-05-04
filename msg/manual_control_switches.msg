@@ -1,3 +1,5 @@
+# Positions of remote control switches which are assigned to specific functions
+
 uint64 timestamp                 # time since system start (microseconds)
 
 uint64 timestamp_sample          # the timestamp of the raw data (microseconds)
